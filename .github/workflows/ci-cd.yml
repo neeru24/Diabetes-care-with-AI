@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+﻿name: CI/CD Pipeline
 
 on:
   push:
@@ -54,7 +54,7 @@ jobs:
             
             // Post validation results as comment
             if (errors.length > 0) {
-              const comment = `## ⚠️ Issue Validation\n\nPlease address the following:\n\n${errors.map(e => `- ${e}`).join('\n')}\n\n_This is an automated check to ensure quality issue reports._`;
+              const comment = `## âš ï¸ Issue Validation\n\nPlease address the following:\n\n${errors.map(e => `- ${e}`).join('\n')}\n\n_This is an automated check to ensure quality issue reports._`;
               
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -155,7 +155,7 @@ jobs:
                 c.user.type === 'Bot' && c.body.includes('PR Validation')
               );
               
-              const comment = `## 📋 PR Validation\n\nSuggestions for this PR:\n\n${warnings.map(w => `- ${w}`).join('\n')}\n\n_This is an automated check._`;
+              const comment = `## ðŸ“‹ PR Validation\n\nSuggestions for this PR:\n\n${warnings.map(w => `- ${w}`).join('\n')}\n\n_This is an automated check._`;
               
               if (!botComment) {
                 await github.rest.issues.createComment({
@@ -166,3 +166,4 @@ jobs:
                 });
               }
             }
+
