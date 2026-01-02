@@ -11,6 +11,49 @@
       background-size: 20px 20px;
     }
 
+    .navbar {
+      background-color: #1d4ed8;
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .navbar-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+    }
+
+    .navbar-links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .navbar-links a {
+      color: #e5e7eb;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .navbar-links a:hover {
+      color: #bfdbfe;
+    }
+
     /* Smooth fade-in for result */
     #result.show {
       animation: fadeIn 0.7s ease forwards;
@@ -24,6 +67,21 @@
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex flex-col">
   
+  <header class="navbar">
+    <div class="navbar-inner">
+      <h1 class="navbar-title">🩺 Diabetes Care</h1>
+      <nav>
+        <ul class="navbar-links">
+          <li><a href="/index">Prediction</a></li>
+          <li><a href="/life">Lifestyle Check</a></li>
+          <li><a href="/chatbot">Chatbot</a></li>
+          <li><a href="/explore">Explore Data</a></li>
+          <li><a href="/forum">Forum</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
   <main class="flex-grow flex items-center justify-center p-6">
     <div class="max-w-lg w-full bg-white/30 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20">
       <h2 class="text-3xl font-extrabold mb-6 text-center text-blue-800 tracking-wide">🌿 Personalized Lifestyle Plan</h2>
