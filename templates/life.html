@@ -5,38 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Personalized Lifestyle Plan</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      background-image: radial-gradient(#dbeafe 1px, transparent 1px);
-      background-size: 20px 20px;
-    }
-    #result.show {
-      animation: fadeIn 0.7s ease forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .category-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .category-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    }
-    .loading-spinner {
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #3b82f6;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+<style>
+  /* --- NAVBAR FIXES --- */
+  .navbar {
+    background-color: #1d4ed8; /* blue-700 */
+    color: white;
+    padding: 1rem 1.5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .navbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .navbar-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+  }
+
+  .navbar-links {
+    display: flex !important; /* Forces horizontal layout */
+    flex-direction: row !important;
+    list-style: none;
+    gap: 1.5rem; /* Space between links */
+    margin: 0;
+    padding: 0;
+  }
+
+  .navbar-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .navbar-links a:hover {
+    color: #93c5fd; /* blue-300 */
+  }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex flex-col">
