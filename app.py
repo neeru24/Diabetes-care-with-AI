@@ -47,12 +47,6 @@ babel = Babel(app)
 
 
 def get_locale():
-    """
-    Select locale based on priority:
-    1. User's cookie preference
-    2. Browser's Accept-Language header
-    3. Default language (English)
-    """
     # Check for user's language preference in cookie
     user_language = request.cookies.get('language')
     if user_language and user_language in SUPPORTED_LANGUAGES:

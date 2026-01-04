@@ -89,7 +89,9 @@
             <div>{{ hist_bmi_html|safe }}</div>
         </div>
 
-        <a href="/" class="btn-back" aria-label="{{ _('Back to Home') }}">{{ _('Back to Home') }}</a>
+      <a href="{{ url_for('home') }}" class="btn-back" aria-label="{{ _('Back to Home') }}">
+    {{ _('Back to Home') }}
+</a>
     </main>
 
     <footer class="bg-blue-700 text-white text-center py-4">

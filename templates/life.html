@@ -9,7 +9,7 @@
   <style>
     /* --- Navbar Improvement Section --- */
     .navbar {
-      background-color: #1d4ed8; /* Tailwind blue-700 */
+      background-color: #1d4ed8; 
       color: white;
       position: fixed;
       top: 0;
@@ -33,11 +33,11 @@
       font-size: 1.5rem;
       font-weight: 800;
       color: #fff;
-      text-shadow: 1px 1px 0 rgba(0,0,0,0.15), 2px 2px 0 rgba(0,0,0,0.08); /* Kept your 3D style */
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.15), 2px 2px 0 rgba(0,0,0,0.08); 
     }
 
     .navbar-links {
-      display: flex !important; /* Forces items horizontal */
+      display: flex !important; 
       list-style: none;
       gap: 1.5rem;
       margin: 0;
@@ -53,43 +53,28 @@
     }
 
     .navbar-links li a:hover {
-      color: #bfdbfe; /* Tailwind blue-200 */
+      color: #bfdbfe; 
     }
 
-    /* Prevent content from hiding under the fixed navbar */
     body {
       padding-top: 80px; 
-    }
-    body {
       background-image: radial-gradient(#dbeafe 1px, transparent 1px);
       background-size: 20px 20px;
     }
-
     #result.show {
       animation: fadeIn 0.7s ease forwards;
     }
-
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
     .category-card {
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-
     .category-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     }
-
     .loading-spinner {
       border: 3px solid #f3f3f3;
       border-top: 3px solid #3b82f6;
@@ -99,15 +84,9 @@
       animation: spin 1s linear infinite;
       display: inline-block;
     }
-
     @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -166,18 +145,34 @@
     const submitBtn = document.getElementById('submitBtn');
     const btnText = document.getElementById('btnText');
     const btnSpinner = document.getElementById('btnSpinner');
+    
+    const weightInput = document.getElementById('weight');
+    const heightInput = document.getElementById('height');
+    const bmiInput = document.getElementById('bmi');
 
-    const GENERATING_TEXT = "{{ _('Generating...') }}";
-    const GENERATE_TEXT = "{{ _('Generate Plan') }}";
-    const ERROR_TEXT = "{{ _('Something went wrong. Please try again.') }}";
+    function calculateBMI() {
+      const weight = parseFloat(weightInput.value);
+      const heightCm = parseFloat(heightInput.value);
+
+      if (weight > 0 && heightCm > 0) {
+        const heightM = heightCm / 100;
+        const bmi = weight / (heightM * heightM);
+        bmiInput.value = bmi.toFixed(1);
+      } else {
+        bmiInput.value = '';
+      }
+    }
+
+    weightInput.addEventListener('input', calculateBMI);
+    heightInput.addEventListener('input', calculateBMI);
+
+    const categoryIcons = {
+      diet: '🍽️', exercise: '🏃', stress: '🧘', sleep: '😴', monitoring: '📊'
+    };
 
     const categoryIcons = { diet: '', exercise: '', stress: '', sleep: '', monitoring: '' };
     const categoryTitles = {
-      diet: "{{ _('Diet & Nutrition') }}",
-      exercise: "{{ _('Exercise & Activity') }}",
-      stress: "{{ _('Stress Management') }}",
-      sleep: "{{ _('Sleep & Recovery') }}",
-      monitoring: "{{ _('Health Monitoring') }}"
+      diet: 'Diet & Nutrition', exercise: 'Exercise & Activity', stress: 'Stress Management', sleep: 'Sleep & Recovery', monitoring: 'Health Monitoring'
     };
 
     function setLoading(loading) {
@@ -189,7 +184,6 @@
 
     function renderPlan(data) {
       const { plan, profile, source } = data;
-
       let profileHtml = `
         <div class="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
           <h3 class="text-lg font-semibold text-blue-800 mb-2">{{ _('Your Profile') }}</h3>
@@ -219,26 +213,23 @@
           `;
         }
       }
-
       planHtml += '</div>';
-
-      if (source === 'ai') {
-        planHtml += '<p class="text-xs text-gray-500 mt-4 text-center">{{ _("Personalized with AI") }}</p>';
-      }
+      if (source === 'ai') planHtml += '<p class="text-xs text-gray-500 mt-4 text-center">✨ Personalized with AI</p>';
 
       resultDiv.innerHTML = profileHtml + planHtml;
       resultDiv.classList.remove('hidden');
       resultDiv.classList.add('show');
     }
 
-    function renderError(message) {
-      resultDiv.innerHTML = `<div class="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700"><strong>{{ _('Error') }}:</strong> ${message}</div>`;
-      resultDiv.classList.remove('hidden');
-      resultDiv.classList.add('show');
-    }
-
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      // Secondary check: Ensure BMI was actually calculated
+      if (!bmiInput.value) {
+        alert("Please enter valid weight and height to calculate your BMI.");
+        return;
+      }
+
       setLoading(true);
 
       const formData = { age: form.age.value, bmi: form.bmi.value, activity: form.activity.value };
@@ -252,10 +243,12 @@
 
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Failed to generate plan');
+
         renderPlan(data);
       } catch (error) {
         console.error('Error:', error);
-        renderError(error.message || ERROR_TEXT);
+        resultDiv.innerHTML = `<div class="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700"><strong>Error:</strong> ${error.message}</div>`;
+        resultDiv.classList.remove('hidden');
       } finally {
         setLoading(false);
       }
