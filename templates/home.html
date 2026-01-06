@@ -117,25 +117,178 @@
         transform: translateX(-100%);
       }
     }
+    :root {
+  --primary-blue: #0a66c2;
+  --dark-blue: #084d91;
+  --accent-cyan: #00d4ff;
+  --text-white: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.1);
+}
+
+.navbar {
+  background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+  padding: 0.8rem 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: 'Inter', sans-serif;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo Styling */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 10px;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-white);
+  letter-spacing: -0.5px;
+}
+
+.text-accent {
+  color: var(--accent-cyan);
+}
+
+/* Navigation Links */
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Hover Effect: Animated Underline */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--accent-cyan);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--text-white);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-link.active {
+  color: var(--text-white);
+  font-weight: 700;
+}
+
+/* Utility Section */
+.nav-utils {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.lang-selector {
+  display: flex;
+  align-items: center;
+  background: var(--bg-glass);
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: white;
+}
+
+.lang-selector select {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--text-white);
+  color: var(--primary-blue);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive (Mobile) */
+@media (max-width: 992px) {
+  .nav-menu {
+    display: none; /* In a real PR, you'd add a hamburger menu toggle here */
+  }
+}
   </style>
 </head>
 <body class="flex flex-col min-h-screen font-sans bg-gray-50 text-gray-800">
 
   <!-- Header -->
-  <header class="bg-blue-700 text-white shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto flex justify-between items-center py-4 px-6">
-      <h1 class="text-4xl font-extrabold tracking-wide text-white text-3d">🩺 Diabetes Care</h1>
-      <nav>
-        <ul class="flex space-x-6 text-lg font-semibold">
-          <li><a href="/index" class="hover:text-blue-300 transition">Prediction</a></li>
-          <li><a href="/life" class="hover:text-blue-300 transition">Lifestyle Check</a></li>
-          <li><a href="/chatbot" class="hover:text-blue-300 transition">Chatbot</a></li>
-          <li><a href="/explore" class="hover:text-blue-300 transition">Explore Data</a></li>
-          <li><a href="/forum" class="hover:text-blue-300 transition">Forum</a></li>
-        </ul>
-      </nav>
+<nav class="navbar">
+  <div class="nav-container">
+    <!-- Branding -->
+    <a href="#" class="nav-logo">
+      <span class="logo-icon">⚕️</span>
+      <span class="logo-text">Diabetes<span class="text-accent">Care</span></span>
+    </a>
+
+    <!-- Navigation Links -->
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="#" class="nav-link active">Home</a></li>
+      <li class="nav-item"><a href="#" class="nav-link">Prediction</a></li>
+      <li class="nav-item"><a href="#" class="nav-link">Lifestyle Check</a></li>
+      <li class="nav-item"><a href="#" class="nav-link">Chatbot</a></li>
+      <li class="nav-item"><a href="#" class="nav-link">Explore Data</a></li>
+      <li class="nav-item"><a href="#" class="nav-link">Forum</a></li>
+    </ul>
+
+    <!-- Utility Section (Language & Action) -->
+    <div class="nav-utils">
+      <div class="lang-selector">
+        <i class="globe-icon">🌐</i>
+        <select name="language" id="lang">
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+        </select>
+      </div>
+      <button class="btn-primary">Get Started</button>
     </div>
-  </header>
+  </div>
+</nav>
   <br>
 
   <!-- Hero Section -->
