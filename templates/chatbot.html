@@ -1,310 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ _('Diabetes Chatbot') }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background: linear-gradient(135deg, #4a90e2, #50e3c2);
-            min-height: 100vh;
-            color: #333;
-        }
+  <meta charset="UTF-8">
+  <title>AI Health Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        .navbar {
-            background-color: #1d4ed8;
-            color: #ffffff;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .navbar-title {
-            font-size: 1.75rem;
-            font-weight: 800;
-        }
-
-        .navbar-links {
-            list-style: none;
-            display: flex;
-            gap: 1.5rem;
-            margin: 0;
-            padding: 0;
-            font-size: 1.05rem;
-            font-weight: 600;
-        }
-
-        .navbar-links a {
-            color: #e5e7eb;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .navbar-links a:hover {
-            color: #bfdbfe;
-        }
-
-        .chat-container {
-            background-color: #ffffffcc;
-            border-radius: 15px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            height: 80vh;
-            overflow: hidden;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .chat-header {
-            background: #007bff;
-            color: #fff;
-            padding: 18px 20px;
-            font-size: 1.4rem;
-            font-weight: 600;
-            text-align: center;
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
-            letter-spacing: 0.05em;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background-color: #f9f9f9;
-            scrollbar-width: thin;
-            scrollbar-color: #007bff #e1e1e1;
-        }
-
-        .chat-messages::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background-color: #007bff;
-            border-radius: 20px;
-        }
-
-        .message {
-            margin-bottom: 14px;
-            display: flex;
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message.bot {
-            justify-content: flex-start;
-        }
-
-        .message-bubble {
-            max-width: 70%;
-            padding: 14px 20px;
-            border-radius: 25px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .message.user .message-bubble {
-            background: linear-gradient(135deg, #4caf50, #81c784);
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.bot .message-bubble {
-            background: #e0e0e0;
-            color: #333;
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-input {
-            display: flex;
-            padding: 15px 20px;
-            border-top: 1px solid #ddd;
-            background-color: #fff;
-        }
-
-        .chat-input input[type="text"] {
-            flex-grow: 1;
-            padding: 14px 18px;
-            border: 2px solid #007bff;
-            border-radius: 25px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .chat-input input[type="text"]:focus {
-            border-color: #0056b3;
-            box-shadow: 0 0 8px #0056b3aa;
-        }
-
-        .chat-input button {
-            margin-left: 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 14px 24px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.5);
-        }
-
-        .chat-input button:hover {
-            background-color: #0056b3;
-            box-shadow: 0 6px 16px rgba(0, 86, 179, 0.7);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-
+  <style>
+    body {
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05) 0%, transparent 40%);
+      background-size: 200px 200px;
+    }
+  </style>
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 flex items-center justify-center">
 
-    {% include 'navbar.html' %}
+  <!-- Chatbot Card -->
+  <div class="w-full max-w-md bg-white bg-opacity-90 backdrop-blur-md rounded-3xl shadow-2xl flex flex-col overflow-hidden">
 
-    <main class="flex-grow flex justify-center items-center p-5">
-        <div class="chat-container">
-            <div class="chat-header">
-                {{ _('Diabetes Expert Chatbot') }}
-            </div>
-            <div class="chat-messages" id="chat-messages">
-                <div class="message bot">
-                    <div class="message-bubble">Hello! I'm here to help you understand diabetes and answer your
-                        questions. How can I assist you today?</div>
-                </div>
-            </div>
-            <div class="chat-input">
-                <input type="text" id="user-input" placeholder="{{ _('Type your message...') }}">
-                <button onclick="sendMessage()">{{ _('Send') }}</button>
-            </div>
-        </div>
-    </main>
+    <!-- Header -->
+    <div class="bg-blue-700 text-white px-6 py-4 flex items-center justify-between">
+      <h1 class="text-lg font-bold flex items-center gap-2">
+        🤖 AI Health Assistant
+      </h1>
+      <a href="/" class="text-sm hover:underline">← Back</a>
+    </div>
 
-    <script>
-        const THINKING_TEXT = "{{ _('Thinking...') }}";
-        const ERROR_TEXT = "{{ _('Sorry, I could not get a response. Please try again.') }}";
-        const SENDING_TEXT = "{{ _('Sending message, please wait...') }}";
+    <!-- Chat Messages -->
+    <div id="chatMessages" class="flex-1 p-5 space-y-4 overflow-y-auto bg-blue-50 text-sm">
+      <div class="bg-white p-3 rounded-xl shadow max-w-[80%]">
+        👋 Hello! I'm your AI Health Assistant.<br>
+        Ask me about:
+        <ul class="list-disc ml-4 mt-2 text-gray-600">
+          <li>Diabetes</li>
+          <li>BMI</li>
+          <li>Glucose levels</li>
+          <li>Lifestyle tips</li>
+        </ul>
+      </div>
+    </div>
 
-        async function sendMessage() {
-            const userInput = document.getElementById('user-input');
-            const chatMessages = document.getElementById('chat-messages');
-            const message = userInput.value.trim();
+    <!-- Typing Indicator -->
+    <div id="typingIndicator" class="hidden px-5 pb-2 text-gray-500 text-xs">
+      AI is typing...
+    </div>
 
-            if (message === '') return;
+    <!-- Input -->
+    <div class="p-4 border-t flex gap-2 bg-white">
+      <input
+        id="userInput"
+        type="text"
+        placeholder="Type your question..."
+        class="flex-1 border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      />
+      <button
+        onclick="sendMessage()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-xl font-semibold transition">
+        Send
+      </button>
+    </div>
 
-            const userMessageDiv = document.createElement('div');
-            userMessageDiv.classList.add('message', 'user');
-            userMessageDiv.innerHTML = `<div class="message-bubble">${message}</div>`;
-            chatMessages.appendChild(userMessageDiv);
-            userInput.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+  </div>
 
-            const thinkingMessageDiv = document.createElement('div');
-            thinkingMessageDiv.classList.add('message', 'bot');
-            thinkingMessageDiv.innerHTML = `<div class="message-bubble">${THINKING_TEXT}</div>`;
-            chatMessages.appendChild(thinkingMessageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+  <!-- JavaScript -->
+  <script>
+    const chatBox = document.getElementById("chatMessages");
+    const input = document.getElementById("userInput");
+    const typing = document.getElementById("typingIndicator");
 
-            try {
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
-                });
+    function addMessage(text, sender = "bot") {
+      const msg = document.createElement("div");
+      msg.className =
+        sender === "user"
+          ? "bg-blue-600 text-white p-3 rounded-xl ml-auto max-w-[80%]"
+          : "bg-white p-3 rounded-xl shadow max-w-[80%]";
+      msg.innerText = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-                chatMessages.removeChild(thinkingMessageDiv);
+    function botResponse(message) {
+      let reply = "I'm here to help you with health-related questions.";
 
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      message = message.toLowerCase();
 
-                const data = await response.json();
-                const botMessageDiv = document.createElement('div');
-                botMessageDiv.classList.add('message', 'bot');
-                botMessageDiv.innerHTML = `<div class="message-bubble">${formatMarkdown(data.reply)}</div>`;
-                chatMessages.appendChild(botMessageDiv);
-            } catch (error) {
-                console.error('Error:', error);
-                chatMessages.removeChild(thinkingMessageDiv);
-                const errorMessageDiv = document.createElement('div');
-                errorMessageDiv.classList.add('message', 'bot');
-                errorMessageDiv.innerHTML = `<div class="message-bubble">${ERROR_TEXT}</div>`;
-                chatMessages.appendChild(errorMessageDiv);
-            } finally {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
+      if (message.includes("diabetes"))
+        reply = "Diabetes is a condition where blood sugar levels are too high. Regular monitoring is important.";
+      else if (message.includes("glucose"))
+        reply = "Normal fasting glucose levels are usually between 70 and 99 mg/dL.";
+      else if (message.includes("bmi"))
+        reply = "BMI (Body Mass Index) helps assess body weight. A healthy BMI range is 18.5–24.9.";
+      else if (message.includes("diet"))
+        reply = "A balanced diet with low sugar, whole grains, and vegetables helps control diabetes.";
+      else if (message.includes("exercise"))
+        reply = "Daily exercise like walking or yoga improves insulin sensitivity.";
+      else if (message.includes("prediction"))
+        reply = "Predictions are based on data patterns and should not replace professional medical advice.";
+      else
+        reply = "Please ask about diabetes, BMI, glucose, exercise, or diet.";
 
-        // Send message on Enter key press
-        document.getElementById('user-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
+      setTimeout(() => {
+        typing.classList.add("hidden");
+        addMessage(reply, "bot");
+      }, 700);
+    }
 
-        function formatMarkdown(text) {
-            if (!text) return '';
-            let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            html = html.replace(/###\s*(.+?)(?=\n|$)/g, '\n<h3>$1</h3>\n');
-            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            return html;
-        }
+    function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
 
-        // Language selector
-        document.getElementById('lang-btn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.getElementById('lang-dropdown').classList.toggle('show');
-        });
-        document.addEventListener('click', function() {
-            document.getElementById('lang-dropdown').classList.remove('show');
-        });
-        function setLanguage(langCode) {
-            fetch('/api/set-language', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ language: langCode })
-            })
-            .then(response => response.json())
-            .then(data => { if (data.success) window.location.reload(); })
-            .catch(err => console.error('Language switch failed:', err));
-        }
-    </script>
+      addMessage(text, "user");
+      input.value = "";
+
+      typing.classList.remove("hidden");
+      botResponse(text);
+    }
+
+    input.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+
 </body>
-
 </html>
