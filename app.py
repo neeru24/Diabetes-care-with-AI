@@ -190,6 +190,12 @@ def predict():
         ]
         features = [float(request.form.get(f, 0)) for f in expected_features]
 
+        # --- NEW VALIDATION CODE START ---
+        # Check if any feature in the list is negative
+        if any(f < 0 for f in features):
+             return render_template('index.html', prediction_text=_("Error: Input values cannot be negative."))
+        # --- NEW VALIDATION CODE END ---
+
         if scaler is None or model is None:
             return render_template('index.html', prediction_text=_("Model not available."))
 
@@ -201,7 +207,6 @@ def predict():
     except Exception as e:
         logging.error(f"Predict error: {e}")
         return render_template('index.html', prediction_text=_("Error during prediction."))
-
 
 @app.route('/explore')
 def explore():
