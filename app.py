@@ -236,7 +236,7 @@ def login():
         }
 
         flash(_("Login successful"), "success")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('home'))
 
     return render_template('login.html')
 
