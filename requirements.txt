@@ -9,4 +9,5 @@ matplotlib
 requests
 plotly
 seaborn
+flask_cors
 
