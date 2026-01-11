@@ -213,6 +213,163 @@ def predict():
         logging.error(f"Predict error: {e}")
         return render_template('index.html', prediction_text=_("Error during prediction."))
 
+# Rate limiting for email - simple in-memory store
+email_rate_limit = {}  # {ip: [timestamps]}
+EMAIL_RATE_LIMIT = 5  # max emails per hour
+EMAIL_RATE_WINDOW = 3600  # 1 hour in seconds
+
+
+@app.route('/api/send-prediction-email', methods=['POST'])
+def send_prediction_email():
+    """Send prediction results via email."""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        email = data.get('email', '').strip()
+        prediction_result = data.get('prediction', '')
+        input_values = data.get('inputValues', {})
+        
+        # Validate email
+        if not email or '@' not in email or '.' not in email:
+            return jsonify({'error': 'Please provide a valid email address'}), 400
+        
+        if not prediction_result:
+            return jsonify({'error': 'No prediction result to send'}), 400
+        
+        # Rate limiting
+        client_ip = request.remote_addr
+        current_time = datetime.now().timestamp()
+        
+        if client_ip in email_rate_limit:
+            # Clean old timestamps
+            email_rate_limit[client_ip] = [
+                ts for ts in email_rate_limit[client_ip] 
+                if current_time - ts < EMAIL_RATE_WINDOW
+            ]
+            if len(email_rate_limit[client_ip]) >= EMAIL_RATE_LIMIT:
+                return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
+        else:
+            email_rate_limit[client_ip] = []
+        
+        # Build email content
+        report_date = datetime.now().strftime('%B %d, %Y at %I:%M %p')
+        
+        # HTML email template
+        html_body = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {{ font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; }}
+        .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }}
+        .header {{ background: linear-gradient(135deg, #2563eb, #4f46e5); color: white; padding: 30px; text-align: center; }}
+        .header h1 {{ margin: 0; font-size: 24px; }}
+        .header p {{ margin: 10px 0 0; opacity: 0.9; }}
+        .content {{ padding: 30px; }}
+        .result-box {{ background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px; }}
+        .result-box h2 {{ margin: 0 0 10px; font-size: 18px; opacity: 0.9; }}
+        .result-box p {{ margin: 0; font-size: 28px; font-weight: bold; }}
+        .values-section {{ background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 25px; }}
+        .values-section h3 {{ margin: 0 0 15px; color: #1e40af; font-size: 16px; }}
+        .value-row {{ display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }}
+        .value-row:last-child {{ border-bottom: none; }}
+        .value-label {{ color: #64748b; }}
+        .value-data {{ color: #1e293b; font-weight: 600; }}
+        .disclaimer {{ background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 15px; margin-bottom: 20px; }}
+        .disclaimer p {{ margin: 0; color: #92400e; font-size: 13px; }}
+        .footer {{ text-align: center; padding: 20px; color: #64748b; font-size: 12px; border-top: 1px solid #e2e8f0; }}
+        .footer a {{ color: #2563eb; text-decoration: none; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚕️ Diabetes Prediction Report</h1>
+            <p>{report_date}</p>
+        </div>
+        <div class="content">
+            <div class="result-box">
+                <h2>PREDICTION RESULT</h2>
+                <p>{prediction_result}</p>
+            </div>
+            <div class="values-section">
+                <h3>📊 Input Values</h3>
+                <div class="value-row"><span class="value-label">Pregnancies</span><span class="value-data">{input_values.get('Pregnancies', 'N/A')}</span></div>
+                <div class="value-row"><span class="value-label">Glucose Level</span><span class="value-data">{input_values.get('Glucose', 'N/A')} mg/dL</span></div>
+                <div class="value-row"><span class="value-label">Blood Pressure</span><span class="value-data">{input_values.get('BloodPressure', 'N/A')} mm Hg</span></div>
+                <div class="value-row"><span class="value-label">Skin Thickness</span><span class="value-data">{input_values.get('SkinThickness', 'N/A')} mm</span></div>
+                <div class="value-row"><span class="value-label">Insulin Level</span><span class="value-data">{input_values.get('Insulin', 'N/A')} μU/mL</span></div>
+                <div class="value-row"><span class="value-label">BMI</span><span class="value-data">{input_values.get('BMI', 'N/A')} kg/m²</span></div>
+                <div class="value-row"><span class="value-label">Diabetes Pedigree</span><span class="value-data">{input_values.get('DiabetesPedigreeFunction', 'N/A')}</span></div>
+                <div class="value-row"><span class="value-label">Age</span><span class="value-data">{input_values.get('Age', 'N/A')} years</span></div>
+            </div>
+            <div class="disclaimer">
+                <p><strong>⚠️ Disclaimer:</strong> This prediction is for informational purposes only and should not be considered medical advice. Please consult a healthcare professional for proper diagnosis and treatment.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Sent from <a href="#">Diabetes Care with AI</a></p>
+            <p>© {datetime.now().year} Diabetes Care Platform</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+        
+        # Plain text fallback
+        text_body = f"""
+DIABETES PREDICTION REPORT
+==========================
+Date: {report_date}
+
+RESULT: {prediction_result}
+
+INPUT VALUES:
+- Pregnancies: {input_values.get('Pregnancies', 'N/A')}
+- Glucose Level: {input_values.get('Glucose', 'N/A')} mg/dL
+- Blood Pressure: {input_values.get('BloodPressure', 'N/A')} mm Hg
+- Skin Thickness: {input_values.get('SkinThickness', 'N/A')} mm
+- Insulin Level: {input_values.get('Insulin', 'N/A')} μU/mL
+- BMI: {input_values.get('BMI', 'N/A')} kg/m²
+- Diabetes Pedigree Function: {input_values.get('DiabetesPedigreeFunction', 'N/A')}
+- Age: {input_values.get('Age', 'N/A')} years
+
+DISCLAIMER: This prediction is for informational purposes only
+and should not be considered medical advice. Please consult a
+healthcare professional for proper diagnosis.
+
+---
+Sent from Diabetes Care Platform
+"""
+        
+        # Check if mail is configured
+        if not app.config.get('MAIL_USERNAME'):
+            return jsonify({'error': 'Email service is not configured'}), 503
+        
+        # Send email
+        msg = Message(
+            subject=f"Your Diabetes Prediction Report - {datetime.now().strftime('%B %d, %Y')}",
+            recipients=[email],
+            body=text_body,
+            html=html_body
+        )
+        mail.send(msg)
+        
+        # Record for rate limiting
+        email_rate_limit[client_ip].append(current_time)
+        
+        logging.info(f"Prediction report sent to {email}")
+        return jsonify({'success': True, 'message': 'Report sent successfully!'})
+        
+    except Exception as e:
+        logging.error(f"Email send error: {e}")
+        return jsonify({'error': 'Failed to send email. Please try again later.'}), 500
+
+
 @app.route('/explore')
 def explore():
     if df is None:
