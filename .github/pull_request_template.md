@@ -34,7 +34,7 @@ Add screenshots or screen recordings to show UI changes.
 ## ✅ Checklist
 Please confirm the following:
 
-- [ ] My code follows the project’s coding style
+- [ ] My code follows the project's coding style
 - [ ] I have tested my changes
 - [ ] I have updated documentation where necessary
 - [ ] This PR does not introduce breaking changes
