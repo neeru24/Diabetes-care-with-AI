@@ -11,6 +11,10 @@ import json
 from datetime import datetime, timezone
 from config import Config
 # --- External Libraries ---
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -22,8 +26,13 @@ from flask_mail import Mail, Message
 from flask_babel import Babel, gettext as _
 from dotenv import load_dotenv
 
+# --- New Auth Imports ---
+from flask_login import LoginManager, login_user, current_user, logout_user, login_required
+from flask_bcrypt import Bcrypt
+
 # --- Database & New AI SDK Imports ---
-from models import db, Post  # Feature #113: Database Model
+# Updated to import User and Prediction models
+from models import db, Post, User, Prediction  # Feature #113: Database Model
 # from google import genai     # Fix #112: New Google GenAI SDK
 import google.generativeai as genai
 
@@ -44,6 +53,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 with app.app_context():
     db.create_all()
+
+# --- Auth Configuration (New) ---
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # --- App Configuration ---
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -88,6 +106,7 @@ def inject_i18n_context():
         'languages': SUPPORTED_LANGUAGES,
         'current_language': get_locale(),
         'current_year': datetime.now().year,
+        'current_user': current_user # Make user available in all templates
     }
 
 @app.route('/api/set-language', methods=['POST'])
@@ -222,6 +241,18 @@ def predict():
         final_input = scaler.transform([features])
         prediction = model.predict(final_input)
         result = _("Diabetic") if prediction[0] == 1 else _("Not Diabetic")
+
+        # --- SAVE HISTORY IF LOGGED IN (New) ---
+        if current_user.is_authenticated:
+            new_pred = Prediction(
+                glucose=int(features[1]),
+                bmi=float(features[5]),
+                age=int(features[7]),
+                result=result,
+                author=current_user
+            )
+            db.session.add(new_pred)
+            db.session.commit()
 
         return render_template('index.html', prediction_text=_("Prediction: %(result)s", result=result))
     except Exception as e:
@@ -1047,6 +1078,45 @@ def mark_notifications_read(user_id):
                         count += 1
     
     return jsonify({"message": f"Processed {count} notifications"})
+
+# --- NEW AUTH ROUTES (Register, Login, Logout, Dashboard) ---
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        hashed_password = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
+        user = User(username=request.form.get('username'), email=request.form.get('email'), password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        flash('Account created! You can now login', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        user = User.query.filter_by(email=request.form.get('email')).first()
+        if user and bcrypt.check_password_hash(user.password, request.form.get('password')):
+            login_user(user)
+            return redirect(url_for('home'))
+        else:
+            flash('Login Unsuccessful. Check email and password', 'danger')
+    return render_template('login.html')
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    user_predictions = Prediction.query.filter_by(author=current_user).order_by(Prediction.date_posted.desc()).all()
+    return render_template('dashboard.html', predictions=user_predictions)
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
