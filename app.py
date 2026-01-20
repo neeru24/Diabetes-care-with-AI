@@ -2,17 +2,14 @@ import os
 import base64
 import io
 import logging
-import pickle
 import re
 import sys
-import threading
 import joblib
 import json
 import warnings
 from datetime import datetime, timezone
 from config import Config
 
-# Suppress scikit-learn version warnings
 warnings.filterwarnings('ignore', category=UserWarning, module='sklearn')
 
 from dotenv import load_dotenv
@@ -24,7 +21,7 @@ import pandas as pd
 import plotly.express as px
 import seaborn as sns
 
-from flask import Flask, jsonify, render_template, request, make_response, redirect, url_for, flash
+from flask import Flask, jsonify, render_template, request, make_response, session, redirect, url_for, flash
 from flask_cors import CORS
 from flask_mail import Mail, Message
 from flask_babel import Babel, gettext as _
@@ -32,10 +29,9 @@ from flask_login import LoginManager, login_user, current_user, logout_user, log
 from flask_bcrypt import Bcrypt
 
 from models import db, Post, User, PredictionHistory
-
 import google.generativeai as genai
 
-# ------------------- APP SETUP -------------------
+# ---------------- APP SETUP ----------------
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -48,7 +44,6 @@ with app.app_context():
     db.create_all()
 
 bcrypt = Bcrypt(app)
-
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -58,7 +53,7 @@ def load_user(user_id):
 
 CORS(app)
 
-# ------------------- BABEL -------------------
+# ---------------- LANGUAGE SETUP ----------------
 
 SUPPORTED_LANGUAGES = {
     'en': 'English',
@@ -78,27 +73,40 @@ def get_locale():
     user_language = request.cookies.get('language')
     if user_language in SUPPORTED_LANGUAGES:
         return user_language
-    return DEFAULT_LANGUAGE
+    return request.accept_languages.best_match(SUPPORTED_LANGUAGES.keys()) or DEFAULT_LANGUAGE
 
 babel.init_app(app, locale_selector=get_locale)
 
-# ------------------- MAIL -------------------
+@app.context_processor
+def inject_i18n_context():
+    return {
+        'languages': SUPPORTED_LANGUAGES,
+        'current_language': get_locale(),
+        'current_year': datetime.now().year,
+        'current_user': current_user
+    }
+
+@app.route('/api/set-language', methods=['POST'])
+def set_language():
+    data = request.get_json()
+    language = data.get('language')
+    if language not in SUPPORTED_LANGUAGES:
+        return jsonify({'error': 'Unsupported language'}), 400
+    response = make_response(jsonify({'success': True}))
+    response.set_cookie('language', language, max_age=365*24*60*60, samesite='Lax')
+    return response
+
+# ---------------- MAIL ----------------
 
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@diabetescare.com')
 
 mail = Mail(app)
 
-# ------------------- LOGGING -------------------
-
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
-                    format='%(asctime)s %(levelname)s: %(message)s')
-
-# ------------------- ML MODEL -------------------
+# ---------------- MODEL LOAD ----------------
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "models", "diabetes_model.pkl")
@@ -108,27 +116,28 @@ try:
     model = joblib.load(MODEL_PATH)
     scaler = joblib.load(SCALER_PATH)
 except:
-    model, scaler = None, None
+    model = scaler = None
 
 try:
     df = pd.read_csv('diabetes.csv')
 except:
     df = None
 
-# ------------------- GEMINI FIX -------------------
+# ---------------- GEMINI FIX ----------------
+# ❌ REMOVED genai.Client()
+# ✅ Correct API usage
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-gemini_model = genai.GenerativeModel("gemini-1.5-flash")
 
-def get_gemini_response(user_message):
+def get_gemini_response(prompt):
     try:
-        response = gemini_model.generate_content(user_message)
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(prompt)
         return response.text
-    except Exception as e:
-        logging.error(f"Gemini error: {e}")
-        return "Sorry, Gemini service is unavailable right now."
+    except:
+        return "Gemini service unavailable."
 
-# ------------------- ROUTES -------------------
+# ---------------- ROUTES ----------------
 
 @app.route('/')
 def root():
@@ -138,137 +147,69 @@ def root():
 def home():
     return render_template('index.html')
 
-# ------------------- AUTH -------------------
+# ---------------- AUTH (ONLY ONE SET) ----------------
 
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-
-    if request.method == 'POST':
-        hashed = bcrypt.generate_password_hash(request.form['password']).decode('utf-8')
-        user = User(
-            username=request.form['username'],
-            email=request.form['email'],
-            password=hashed
-        )
-        db.session.add(user)
-        db.session.commit()
-        flash('Account created successfully!', 'success')
-        return redirect(url_for('login'))
-
-    return render_template('register.html')
-
-@app.route("/login", methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-
     if request.method == 'POST':
-        user = User.query.filter_by(email=request.form['email']).first()
-        if user and bcrypt.check_password_hash(user.password, request.form['password']):
+        data = request.form
+        user = User.query.filter_by(email=data.get('email')).first()
+        if user and bcrypt.check_password_hash(user.password, data.get('password')):
             login_user(user)
             return redirect(url_for('dashboard'))
-        else:
-            flash('Login Unsuccessful. Check email and password', 'danger')
-
+        flash("Invalid credentials", "danger")
     return render_template('login.html')
 
-@app.route("/logout")
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        hashed = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
+        user = User(username=request.form.get('username'),
+                    email=request.form.get('email'),
+                    password=hashed)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('signup.html')
+
+@app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('root'))
 
-@app.route("/dashboard")
+@app.route('/dashboard')
 @login_required
 def dashboard():
     predictions = PredictionHistory.query.filter_by(user_id=current_user.id).all()
     return render_template('dashboard.html', predictions=predictions)
 
-# ------------------- PREDICTION -------------------
+# ---------------- PREDICTION ----------------
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        features = [
-            float(request.form.get(f, 0)) for f in
-            ['Pregnancies','Glucose','BloodPressure','SkinThickness','Insulin','BMI','DiabetesPedigreeFunction','Age']
-        ]
+        features = [float(request.form.get(f, 0)) for f in [
+            'Pregnancies','Glucose','BloodPressure','SkinThickness',
+            'Insulin','BMI','DiabetesPedigreeFunction','Age'
+        ]]
+        if model is None or scaler is None:
+            return render_template('index.html', prediction_text="Model not available")
 
-        if any(f < 0 for f in features):
-            return render_template('index.html', prediction_text=_("Negative values not allowed"))
+        result = model.predict(scaler.transform([features]))[0]
+        text = "Diabetic" if result == 1 else "Not Diabetic"
+        return render_template('index.html', prediction_text=text)
+    except:
+        return render_template('index.html', prediction_text="Error")
 
-        if scaler is None or model is None:
-            return render_template('index.html', prediction_text=_("Model not available"))
-
-        final_input = scaler.transform([features])
-        prediction = model.predict(final_input)[0]
-
-        result = _("Diabetic") if prediction == 1 else _("Not Diabetic")
-
-        if current_user.is_authenticated:
-            record = PredictionHistory(
-                user_id=current_user.id,
-                glucose=features[1],
-                bmi=features[5],
-                age=int(features[7]),
-                prediction=int(prediction)
-            )
-            db.session.add(record)
-            db.session.commit()
-
-        return render_template('index.html', prediction_text=_("Prediction: %(result)s", result=result))
-
-    except Exception as e:
-        logging.error(f"Predict error: {e}")
-        return render_template('index.html', prediction_text=_("Error during prediction"))
-
-# ------------------- CHATBOT -------------------
-
-@app.route('/chatbot')
-def chatbot_page():
-    return render_template('chatbot.html')
+# ---------------- CHATBOT ----------------
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    try:
-        user_input = request.json.get('message')
-        if not user_input:
-            return jsonify({'reply': "Please say something!"})
+    user_input = request.json.get('message')
+    reply = get_gemini_response(user_input)
+    return jsonify({'reply': reply})
 
-        response = gemini_model.generate_content(user_input)
-        return jsonify({'reply': response.text})
-
-    except Exception as e:
-        logging.error(e)
-        return jsonify({'reply': "AI service unavailable"})
-
-# ------------------- EXPLORE -------------------
-
-@app.route('/explore')
-def explore():
-    if df is None:
-        return "Dataset not loaded", 500
-
-    corr = df.corr(numeric_only=True)
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(corr, annot=True, cmap='coolwarm')
-
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-
-    heatmap_url = base64.b64encode(img.getvalue()).decode()
-
-    fig = px.histogram(df, x="Glucose")
-
-    return render_template(
-        'explore.html',
-        heatmap_url=heatmap_url,
-        hist_glucose_html=fig.to_html(full_html=False, include_plotlyjs='cdn')
-    )
-
-# ------------------- RUN -------------------
+# ---------------- RUN ----------------
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
