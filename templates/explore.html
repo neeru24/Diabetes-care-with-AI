@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ _('Data Explorer') }} | {{ _('Diabetes Care') }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>tailwind.config = { darkMode: 'class' }</script>
   <script>
@@ -48,6 +49,34 @@
     .plotly-chart .plotly { width: 100% !important; }
     .js-plotly-plot { width: 100% !important; }
     .plot-container { width: 100% !important; }
+     .scroll-to-top {
+            position: fixed;
+             bottom: 30px;
+                right: 30px;
+                width: 50px;
+                height: 50px;
+                background: #8b5cf6;
+                color: #fff;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+                box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+                transition: all 0.3s ease;
+                z-index: 1000;
+            }
+
+            .scroll-to-top:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+            }
+
+            .scroll-to-top.show {
+                display: flex;
+            }
   </style>
 </head>
 
@@ -240,13 +269,74 @@
       </a>
     </div>
   </main>
-
-  <!-- Footer -->
-  <footer class="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-8 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 text-center">
-      <p class="text-gray-400">© {{ current_year }} {{ _('Diabetes Care with AI') }}. {{ _('All rights reserved.') }}</p>
+<!-- Footer -->
+  <footer class="bg-slate-900 dark:bg-slate-950 text-white py-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid md:grid-cols-4 gap-12">
+        <div>
+          <h2 class="text-2xl font-bold mb-4">⚕️ Diabetes<span class="text-cyan-400">Care</span></h2>
+          <p class="text-slate-400">{{ _('Your AI-powered companion for smarter diabetes management.') }}</p>
+        </div>
+        <div>
+          <h4 class="font-bold mb-4 text-slate-200">{{ _('Quick Links') }}</h4>
+          <div class="space-y-2">
+            <a href="/" class="block text-slate-400 hover:text-cyan-400 transition">{{ _('Home') }}</a>
+            <a href="/index" class="block text-slate-400 hover:text-cyan-400 transition">{{ _('Prediction') }}</a>
+            <a href="/life" class="block text-slate-400 hover:text-cyan-400 transition">{{ _('Lifestyle Check') }}</a>
+            <a href="/chatbot" class="block text-slate-400 hover:text-cyan-400 transition">{{ _('Chatbot') }}</a>
+            <a href="/forum" class="block text-slate-400 hover:text-cyan-400 transition">{{ _('Forum') }}</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-bold mb-4 text-slate-200">{{ _('Resources') }}</h4>
+          <div class="space-y-2">
+            <a href="#" class="block text-slate-400 hover:text-cyan-400 transition">{{ _('About Us') }}</a>
+            <a href="#" class="block text-slate-400 hover:text-cyan-400 transition">{{ _('Contact') }}</a>
+            <a href="#" class="block text-slate-400 hover:text-cyan-400 transition">{{ _('Privacy Policy') }}</a>
+            <a href="#" class="block text-slate-400 hover:text-cyan-400 transition">{{ _('Terms & Conditions') }}</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-bold mb-4 text-slate-200">{{ _('Connect') }}</h4>
+          <div class="flex gap-4">
+            <a href="#" class="w-10 h-10 bg-slate-800 hover:bg-cyan-500 rounded-lg flex items-center justify-center transition">
+              <i class="fab fa-github"></i>
+            </a>
+            <a href="#" class="w-10 h-10 bg-slate-800 hover:bg-cyan-500 rounded-lg flex items-center justify-center transition">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="w-10 h-10 bg-slate-800 hover:bg-cyan-500 rounded-lg flex items-center justify-center transition">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-slate-800 mt-12 pt-8 text-center text-slate-500">
+        © {{ current_year }} {{ _('Diabetes Care Platform. All rights reserved.') }}
+      </div>
     </div>
   </footer>
+  <!--Back to Top button with functionality-->
+         <button class="scroll-to-top" id="scrollToTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+        <script>
+             function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollBtn = document.getElementById('scrollToTop');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('show');
+            } else {
+                scrollBtn.classList.remove('show');
+            }
+        });
+        </script>
 
   <script>
     // Dark mode toggle

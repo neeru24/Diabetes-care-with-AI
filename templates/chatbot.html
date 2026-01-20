@@ -208,91 +208,52 @@
     {% include 'navbar.html' %}
 
     <main class="flex-grow flex justify-center items-center p-5">
-        <div class="chat-container dark:bg-slate-800/90 dark:border-slate-700">
-            <div class="chat-header dark:bg-slate-700">
-                {{ _('Diabetes Expert Chatbot') }}
-            </div>
-            <div class="chat-messages dark:bg-slate-900" id="chat-messages">
-                <div class="message bot">
-                    <div class="message-bubble dark:bg-slate-700 dark:text-gray-200">Hello! I'm here to help you understand diabetes and answer your
-                        questions. How can I assist you today?</div>
-                </div>
-            </div>
-            <div class="chat-input dark:bg-slate-800 dark:border-slate-700">
-                <input type="text" id="user-input" placeholder="{{ _('Type your message...') }}" class="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-                <button onclick="sendMessage()">{{ _('Send') }}</button>
-            </div>
+        <div id="vf-embedded-container" style="width: 100%; max-width: 600px; height: 80vh; border-radius: 15px; overflow: hidden; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);">
+            <!-- Voiceflow widget will be embedded here -->
         </div>
     </main>
 
-    <script>
-        const THINKING_TEXT = "{{ _('Thinking...') }}";
-        const ERROR_TEXT = "{{ _('Sorry, I could not get a response. Please try again.') }}";
-        const SENDING_TEXT = "{{ _('Sending message, please wait...') }}";
+    <script type="text/javascript">
 
-        async function sendMessage() {
-            const userInput = document.getElementById('user-input');
-            const chatMessages = document.getElementById('chat-messages');
-            const message = userInput.value.trim();
+  (function(d, t) {
 
-            if (message === '') return;
+      var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
 
-            const userMessageDiv = document.createElement('div');
-            userMessageDiv.classList.add('message', 'user');
-            userMessageDiv.innerHTML = `<div class="message-bubble">${message}</div>`;
-            chatMessages.appendChild(userMessageDiv);
-            userInput.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+      v.onload = function() {
 
-            const thinkingMessageDiv = document.createElement('div');
-            thinkingMessageDiv.classList.add('message', 'bot');
-            thinkingMessageDiv.innerHTML = `<div class="message-bubble">${THINKING_TEXT}</div>`;
-            chatMessages.appendChild(thinkingMessageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+        window.voiceflow.chat.load({
 
-            try {
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
-                });
+          verify: { projectID: '695fe78e14ebf0c1210254c0' },
 
-                chatMessages.removeChild(thinkingMessageDiv);
+          url: 'https://general-runtime.voiceflow.com',
 
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          versionID: 'production',
 
-                const data = await response.json();
-                const botMessageDiv = document.createElement('div');
-                botMessageDiv.classList.add('message', 'bot');
-                botMessageDiv.innerHTML = `<div class="message-bubble">${formatMarkdown(data.reply)}</div>`;
-                chatMessages.appendChild(botMessageDiv);
-            } catch (error) {
-                console.error('Error:', error);
-                chatMessages.removeChild(thinkingMessageDiv);
-                const errorMessageDiv = document.createElement('div');
-                errorMessageDiv.classList.add('message', 'bot');
-                errorMessageDiv.innerHTML = `<div class="message-bubble">${ERROR_TEXT}</div>`;
-                chatMessages.appendChild(errorMessageDiv);
-            } finally {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
+          voice: {
 
-        // Send message on Enter key press
-        document.getElementById('user-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+            url: "https://runtime-api.voiceflow.com"
+
+          },
+
+          render: {
+
+            mode: 'embedded',
+
+            target: document.getElementById("vf-embedded-container")
+
+          }
+
         });
 
-        function formatMarkdown(text) {
-            if (!text) return '';
-            let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            html = html.replace(/###\s*(.+?)(?=\n|$)/g, '\n<h3>$1</h3>\n');
-            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            return html;
-        }
+      }
 
+      v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+
+  })(document, 'script');
+
+</script>
+
+    <script>
         // Language selector
         document.getElementById('lang-btn').addEventListener('click', function(e) {
             e.stopPropagation();

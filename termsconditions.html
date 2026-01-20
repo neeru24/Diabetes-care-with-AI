@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Terms & Conditions - Diabetes Care</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    /* Custom scrollbar for terms sections */
+    .terms-section {
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .terms-section::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .terms-section::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    
+    .terms-section::-webkit-scrollbar-thumb {
+      background: #60a5fa;
+      border-radius: 4px;
+    }
+    
+    .terms-section::-webkit-scrollbar-thumb:hover {
+      background: #3b82f6;
+    }
+    
+    /* Highlight important terms */
+    .highlight-term {
+      background-color: #fef3c7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      color: #92400e;
+    }
+    
+    /* Toggle sections */
+    .toggle-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    
+    .toggle-content.open {
+      max-height: 1000px;
+    }
+    
+    /* Print styles */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      
+      .terms-section {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      
+      .bg-white {
+        background: white !important;
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-white text-gray-800 min-h-screen flex flex-col font-sans">
+  <!-- Navigation Bar -->
+  <header class="bg-blue-700 text-white shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center py-5 px-6">
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide">🩺 Diabetes Care</h1>
+
+      <div class="flex items-center gap-4">
+        <!-- Desktop Nav -->
+        <nav class="hidden md:block">
+          <ul class="flex space-x-4 md:space-x-6 text-lg font-semibold">
+            <li><a href="/index" class="hover:text-blue-300 transition">Prediction</a></li>
+            <li><a href="/life" class="hover:text-blue-300 transition">Lifestyle Check</a></li>
+            <li><a href="/chatbot" class="hover:text-blue-300 transition">Chatbot</a></li>
+            <li><a href="/explore" class="hover:text-blue-300 transition">Explore Data</a></li>
+            <li><a href="/forum" class="hover:text-blue-300 transition">Forum</a></li>
+            <li><a href="/privacy-policy" class="hover:text-blue-300 transition">Privacy</a></li>
+            <li><a href="/terms" class="hover:text-blue-300 transition font-bold border-b-2 border-white">Terms</a></li>
+          </ul>
+        </nav>
+
+        <!-- Mobile Hamburger Button -->
+        <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden bg-blue-800 border-t border-blue-600">
+      <ul class="flex flex-col space-y-2 p-4 text-lg font-semibold">
+        <li><a href="/index" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Prediction</a></li>
+        <li><a href="/life" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Lifestyle Check</a></li>
+        <li><a href="/chatbot" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Chatbot</a></li>
+        <li><a href="/explore" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Explore Data</a></li>
+        <li><a href="/forum" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Forum</a></li>
+        <li><a href="/privacy-policy" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Privacy</a></li>
+        <li><a href="/terms" class="block py-2 px-4 hover:bg-blue-700 rounded transition font-bold bg-blue-700">Terms</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Blue Header Section -->
+  <section class="bg-blue-700 text-white py-12">
+    <div class="container mx-auto text-center">
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide">Terms & Conditions</h1>
+      <p class="text-blue-100 text-base mt-2">Please read these terms carefully before using our services.</p>
+      <div class="mt-6 flex justify-center gap-4 no-print">
+        <button onclick="window.print()" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100 transition flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+          </svg>
+          Print Terms
+        </button>
+        <button onclick="toggleAllSections()" id="toggleAllBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-800 transition">
+          Expand All Sections
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <main class="flex-grow container mx-auto px-4 sm:px-6 py-10 max-w-4xl">
+    <!-- Quick Navigation -->
+    <div class="mb-8 bg-blue-50 p-6 rounded-2xl border border-blue-200 no-print">
+      <h3 class="text-lg font-bold text-blue-800 mb-4">📋 Quick Navigation</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <a href="#acceptance" class="bg-white p-3 rounded-lg text-center hover:bg-blue-100 transition text-blue-700 font-medium border border-blue-200">
+          1. Acceptance
+        </a>
+        <a href="#services" class="bg-white p-3 rounded-lg text-center hover:bg-blue-100 transition text-blue-700 font-medium border border-blue-200">
+          2. Services
+        </a>
+        <a href="#account" class="bg-white p-3 rounded-lg text-center hover:bg-blue-100 transition text-blue-700 font-medium border border-blue-200">
+          3. Account
+        </a>
+        <a href="#conduct" class="bg-white p-3 rounded-lg text-center hover:bg-blue-100 transition text-blue-700 font-medium border border-blue-200">
+          4. User Conduct
+        </a>
+        <a href="#medical" class="bg-white p-3 rounded-lg text-center hover:bg-blue-100 transition text-blue-700 font-medium border border-blue-200">
+          5. Medical Disclaimer
+        </a>
+        <a href="#intellectual" class="bg-white p-3 rounded-lg text-center hover:bg-blue-100 transition text-blue-700 font-medium border border-blue-200">
+          6. Intellectual Property
+        </a>
+        <a href="#liability" class="bg-white p-3 rounded-lg text-center hover:bg-blue-100 transition text-blue-700 font-medium border border-blue-200">
+          7. Liability
+        </a>
+        <a href="#termination" class="bg-white p-3 rounded-lg text-center hover:bg-blue-100 transition text-blue-700 font-medium border border-blue-200">
+          8. Termination
+        </a>
+      </div>
+    </div>
+
+    <!-- Terms Content -->
+    <div class="bg-white p-8 rounded-2xl shadow-xl border border-blue-100 fade-in">
+      
+      <!-- Last Updated & Acceptance Banner -->
+      <div class="mb-8 p-6 bg-blue-50 rounded-xl border border-blue-200 text-center">
+        <p class="text-blue-700 font-bold text-lg">Last Updated: January 18, 2026</p>
+        <p class="text-blue-600 mt-2">
+          By accessing or using Diabetes Care services, you agree to be bound by these Terms & Conditions.
+          <span class="font-semibold block mt-1">If you do not agree with any part of these terms, please do not use our services.</span>
+        </p>
+      </div>
+
+      <!-- 1. Acceptance of Terms -->
+      <section id="acceptance" class="mb-10">
+        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="toggleSection('acceptanceContent')">
+          <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">1</span>
+            Acceptance of Terms
+          </h2>
+          <button class="text-blue-600 hover:text-blue-800 transition" aria-label="Toggle section">
+            <svg id="acceptanceIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+        <div id="acceptanceContent" class="toggle-content open">
+          <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <p class="text-gray-700 leading-relaxed mb-4">
+              Welcome to Diabetes Care. These Terms and Conditions ("Terms") govern your access to and use of the Diabetes Care website, applications, and services (collectively, the "Services"). 
+              By accessing or using our Services, you agree to be bound by these Terms.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div class="bg-white p-4 rounded-lg border border-blue-100">
+                <h4 class="font-semibold text-blue-700 mb-2 flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Your Agreement
+                </h4>
+                <p class="text-sm text-gray-600">
+                  You affirm that you are at least 18 years old or have parental consent to use our Services.
+                </p>
+              </div>
+              <div class="bg-white p-4 rounded-lg border border-blue-100">
+                <h4 class="font-semibold text-blue-700 mb-2 flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                  Legal Capacity
+                </h4>
+                <p class="text-sm text-gray-600">
+                  You have the legal capacity to enter into binding agreements.
+                </p>
+              </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p class="text-yellow-700 font-medium mb-1">⚠️ Important:</p>
+              <p class="text-yellow-600 text-sm">
+                These Terms constitute a legally binding agreement between you and Diabetes Care. We reserve the right to modify these Terms at any time. Continued use after changes constitutes acceptance.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Description of Services -->
+      <section id="services" class="mb-10">
+        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="toggleSection('servicesContent')">
+          <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">2</span>
+            Description of Services
+          </h2>
+          <button class="text-blue-600 hover:text-blue-800 transition" aria-label="Toggle section">
+            <svg id="servicesIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+        <div id="servicesContent" class="toggle-content">
+          <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <p class="text-gray-700 leading-relaxed mb-4">
+              Diabetes Care provides the following services:
+            </p>
+            
+            <div class="space-y-4">
+              <div class="flex items-start gap-3">
+                <div class="bg-blue-100 p-2 rounded-lg">
+                  <span class="text-blue-700 font-bold">A.</span>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-blue-700 mb-1">Diabetes Prediction Tool</h4>
+                  <p class="text-gray-600">
+                    An AI-powered tool that analyzes health metrics to provide diabetes risk predictions. 
+                    <span class="highlight-term">This is not a medical diagnosis</span> and should not replace professional medical advice.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-3">
+                <div class="bg-blue-100 p-2 rounded-lg">
+                  <span class="text-blue-700 font-bold">B.</span>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-blue-700 mb-1">Lifestyle Recommendations</h4>
+                  <p class="text-gray-600">
+                    Personalized suggestions for diet, exercise, and lifestyle modifications based on your health profile.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-3">
+                <div class="bg-blue-100 p-2 rounded-lg">
+                  <span class="text-blue-700 font-bold">C.</span>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-blue-700 mb-1">Community Forum</h4>
+                  <p class="text-gray-600">
+                    A platform for users to share experiences, ask questions, and provide mutual support.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-3">
+                <div class="bg-blue-100 p-2 rounded-lg">
+                  <span class="text-blue-700 font-bold">D.</span>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-blue-700 mb-1">Educational Resources</h4>
+                  <p class="text-gray-600">
+                    Access to articles, guides, and information about diabetes prevention and management.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <h4 class="font-semibold text-blue-700 mb-2">Service Limitations:</h4>
+              <ul class="list-disc pl-6 space-y-2 text-gray-600">
+                <li>Services are provided "as is" and "as available"</li>
+                <li>We may modify, suspend, or discontinue any service at any time</li>
+                <li>Access may be limited during maintenance or technical issues</li>
+                <li>Some features may require account registration</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. User Accounts -->
+      <section id="account" class="mb-10">
+        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="toggleSection('accountContent')">
+          <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">3</span>
+            User Accounts & Registration
+          </h2>
+          <button class="text-blue-600 hover:text-blue-800 transition" aria-label="Toggle section">
+            <svg id="accountIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+        <div id="accountContent" class="toggle-content">
+          <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold text-blue-700 mb-3">Account Creation</h4>
+                <ul class="space-y-2 text-gray-600">
+                  <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    You must provide accurate, current, and complete information
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Maintain and promptly update your account information
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Keep your password confidential
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Notify us immediately of any unauthorized use
+                  </li>
+                </ul>
+              </div>
+              
+              <div>
+                <h4 class="font-semibold text-blue-700 mb-3">Account Responsibilities</h4>
+                <ul class="space-y-2 text-gray-600">
+                  <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Do not share your account with others
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Do not create multiple accounts
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Do not use others' personal information
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Do not create accounts for deceptive purposes
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p class="text-blue-700 font-medium mb-1">ℹ️ Note:</p>
+              <p class="text-blue-600 text-sm">
+                We reserve the right to suspend or terminate accounts that violate these Terms or are involved in fraudulent, abusive, or illegal activities.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. User Conduct -->
+      <section id="conduct" class="mb-10">
+        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="toggleSection('conductContent')">
+          <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">4</span>
+            User Conduct & Community Guidelines
+          </h2>
+          <button class="text-blue-600 hover:text-blue-800 transition" aria-label="Toggle section">
+            <svg id="conductIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+        <div id="conductContent" class="toggle-content">
+          <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <p class="text-gray-700 mb-6">
+              When using our Services, especially the community forum, you agree not to:
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <div class="bg-white p-4 rounded-lg border border-red-100">
+                  <h4 class="font-semibold text-red-700 mb-2 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.782 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                    Prohibited Content
+                  </h4>
+                  <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Harassing, threatening, or abusive content</li>
+                    <li>• Hate speech or discrimination</li>
+                    <li>• Spam or commercial solicitations</li>
+                    <li>• False medical advice</li>
+                    <li>• Illegal or fraudulent content</li>
+                  </ul>
+                </div>
+                
+                <div class="bg-white p-4 rounded-lg border border-yellow-100">
+                  <h4 class="font-semibold text-yellow-700 mb-2 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Forum Guidelines
+                  </h4>
+                  <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Be respectful and supportive</li>
+                    <li>• Share experiences, not diagnoses</li>
+                    <li>• Cite sources for medical information</li>
+                    <li>• Report inappropriate content</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div class="space-y-4">
+                <div class="bg-white p-4 rounded-lg border border-purple-100">
+                  <h4 class="font-semibold text-purple-700 mb-2 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    Security & Access
+                  </h4>
+                  <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Don't attempt unauthorized access</li>
+                    <li>• Don't disrupt or overload services</li>
+                    <li>• Don't introduce viruses or malware</li>
+                    <li>• Don't bypass security measures</li>
+                  </ul>
+                </div>
+                
+                <div class="bg-white p-4 rounded-lg border border-green-100">
+                  <h4 class="font-semibold text-green-700 mb-2 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Medical Content Rules
+                  </h4>
+                  <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• No diagnosis or treatment advice</li>
+                    <li>• No prescription recommendations</li>
+                    <li>• Clear "not medical advice" disclaimers</li>
+                    <li>• Encourage professional consultation</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <h4 class="font-semibold text-blue-700 mb-2">Content Moderation:</h4>
+              <p class="text-gray-600 text-sm">
+                We reserve the right to remove any content that violates these guidelines without prior notice. 
+                Repeated violations may result in account suspension or termination.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Medical Disclaimer -->
+      <section id="medical" class="mb-10">
+        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="toggleSection('medicalContent')">
+          <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">5</span>
+            Medical Disclaimer
+          </h2>
+          <button class="text-blue-600 hover:text-blue-800 transition" aria-label="Toggle section">
+            <svg id="medicalIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+        <div id="medicalContent" class="toggle-content">
+          <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <div class="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
+              <h3 class="text-xl font-bold text-red-800 mb-3 flex items-center gap-2">
+                ⚠️ CRITICAL DISCLAIMER
+              </h3>
+              <p class="text-red-700 font-bold mb-3">
+                DIABETES CARE IS NOT A MEDICAL SERVICE AND DOES NOT PROVIDE MEDICAL ADVICE, DIAGNOSIS, OR TREATMENT.
+              </p>
+              <p class="text-red-600">
+                The information provided through our Services is for informational and educational purposes only. 
+                It is not a substitute for professional medical advice, diagnosis, or treatment.
+              </p>
+            </div>
+            
+            <div class="space-y-6">
+              <div>
+                <h4 class="font-semibold text-blue-700 mb-2">Important Limitations:</h4>
+                <ul class="list-disc pl-6 space-y-2 text-gray-600">
+                  <li>Our diabetes prediction tool provides <span class="highlight-term">risk assessments only</span>, not diagnoses</li>
+                  <li>Results should be discussed with a qualified healthcare professional</li>
+                  <li>Do not make medical decisions based solely on information from our Services</li>
+                  <li>Always seek the advice of your physician or other qualified health provider</li>
+                  <li>Do not disregard professional medical advice or delay seeking it</li>
+                  <li>In case of emergency, call emergency services immediately</li>
+                </ul>
+              </div>
+              
+              <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <h4 class="font-semibold text-yellow-700 mb-2">User Acknowledgment:</h4>
+                <p class="text-yellow-600 text-sm">
+                  By using our Services, you acknowledge and agree that:
+                  <br><br>
+                  1. You understand the limitations of our Services<br>
+                  2. You will consult with healthcare professionals for medical advice<br>
+                  3. You assume all risks associated with using the information provided<br>
+                  4. Diabetes Care is not liable for any health decisions you make
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Intellectual Property -->
+      <section id="intellectual" class="mb-10">
+        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="toggleSection('intellectualContent')">
+          <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">6</span>
+            Intellectual Property Rights
+          </h2>
+          <button class="text-blue-600 hover:text-blue-800 transition" aria-label="Toggle section">
+            <svg id="intellectualIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+        <div id="intellectualContent" class="toggle-content">
+          <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold text-blue-700 mb-3">Our Intellectual Property</h4>
+                <div class="space-y-3">
+                  <div class="bg-white p-3 rounded-lg border">
+                    <p class="text-sm text-gray-600">
+                      All content, features, and functionality (including but not limited to text, graphics, logos, icons, images, audio clips, digital downloads, data compilations, and software) are owned by Diabetes Care or its licensors.
+                    </p>
+                  </div>
+                  <div class="bg-white p-3 rounded-lg border">
+                    <p class="text-sm text-gray-600">
+                      The Diabetes Care name, logo, and all related names, logos, product and service names, designs, and slogans are trademarks of Diabetes Care or its affiliates.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 class="font-semibold text-blue-700 mb-3">License & Permissions</h4>
+                <div class="space-y-3">
+                  <div class="bg-white p-3 rounded-lg border">
+                    <p class="text-sm text-gray-600">
+                      We grant you a limited, non-exclusive, non-transferable license to access and use our Services for personal, non-commercial purposes.
+                    </p>
+                  </div>
+                  <div class="bg-white p-3 rounded-lg border">
+                    <p class="text-sm text-gray-600">
+                      You may not reproduce, distribute, modify, create derivative works of, publicly display, or commercially exploit any part of our Services without express written permission.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <h4 class="font-semibold text-blue-700 mb-2">User Content:</h4>
+              <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <p class="text-blue-600 text-sm">
+                  By posting content on our platform, you grant Diabetes Care a non-exclusive, worldwide, royalty-free license to use, display, reproduce, and distribute your content in connection with our Services. You retain ownership of your content.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Limitation of Liability -->
+      <section id="liability" class="mb-10">
+        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="toggleSection('liabilityContent')">
+          <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">7</span>
+            Limitation of Liability
+          </h2>
+          <button class="text-blue-600 hover:text-blue-800 transition" aria-label="Toggle section">
+            <svg id="liabilityIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+        <div id="liabilityContent" class="toggle-content">
+          <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <div class="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
+              <h3 class="text-lg font-bold text-red-800 mb-2">IMPORTANT: LIMITATION OF LIABILITY</h3>
+              <p class="text-red-600">
+                TO THE MAXIMUM EXTENT PERMITTED BY LAW, DIABETES CARE AND ITS AFFILIATES SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES.
+              </p>
+            </div>
+            
+            <div class="space-y-4">
+              <div>
+                <h4 class="font-semibold text-blue-700 mb-2">Exclusions of Liability:</h4>
+                <ul class="list-disc pl-6 space-y-2 text-gray-600">
+                  <li>Any errors or inaccuracies in content</li>
+                  <li>Personal injury or property damage resulting from use of Services</li>
+                  <li>Unauthorized access to or use of our servers</li>
+                  <li>Interruption or cessation of transmission</li>
+                  <li>Bugs, viruses, or other harmful code</li>
+                  <li>Errors or omissions in any content</li>
+                  <li>Loss or damage of any kind incurred as a result of using our Services</li>
+                </ul>
+              </div>
+              
+              <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <h4 class="font-semibold text-yellow-700 mb-2">Maximum Liability:</h4>
+                <p class="text-yellow-600">
+                  In no event shall Diabetes Care's total liability to you for all damages, losses, and causes of action exceed the amount paid by you, if any, for accessing our Services during the 12 months prior to the claim.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Termination -->
+      <section id="termination" class="mb-10">
+        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="toggleSection('terminationContent')">
+          <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">8</span>
+            Termination
+          </h2>
+          <button class="text-blue-600 hover:text-blue-800 transition" aria-label="Toggle section">
+            <svg id="terminationIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+        <div id="terminationContent" class="toggle-content">
+          <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold text-blue-700 mb-3">By You</h4>
+                <div class="bg-white p-4 rounded-lg border">
+                  <p class="text-gray-600 mb-2">You may terminate your account at any time by:</p>
+                  <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Using the account deletion feature</li>
+                    <li>• Contacting our support team</li>
+                    <li>• Ceasing to use our Services</li>
+                  </ul>
+                  <p class="text-sm text-gray-500 mt-3">
+                    Upon termination, your right to use the Services will immediately cease.
+                  </p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 class="font-semibold text-blue-700 mb-3">By Us</h4>
+                <div class="bg-white p-4 rounded-lg border">
+                  <p class="text-gray-600 mb-2">We may suspend or terminate your access if:</p>
+                  <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• You violate these Terms</li>
+                    <li>• We suspect fraudulent activity</li>
+                    <li>• Required by law</li>
+                    <li>• For operational reasons</li>
+                  </ul>
+                  <p class="text-sm text-gray-500 mt-3">
+                    We will provide notice when reasonably possible.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <h4 class="font-semibold text-blue-700 mb-2">Effect of Termination:</h4>
+              <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <ul class="text-sm text-blue-600 space-y-2">
+                  <li>• Your right to use Services immediately ceases</li>
+                  <li>• We may delete your account information</li>
+                  <li>• Forum posts may remain anonymized</li>
+                  <li>• Provisions that should survive termination will remain in effect</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Additional Sections -->
+      <div class="mt-12 p-6 bg-blue-50 rounded-2xl border border-blue-200 no-print">
+        <h3 class="text-xl font-bold text-blue-800 mb-4">Additional Legal Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <a href="#governing-law" class="bg-white p-4 rounded-lg border border-blue-200 hover:bg-blue-50 transition text-center">
+            <h4 class="font-semibold text-blue-700 mb-1">Governing Law</h4>
+            <p class="text-sm text-gray-600">Jurisdiction and dispute resolution</p>
+          </a>
+          <a href="#changes" class="bg-white p-4 rounded-lg border border-blue-200 hover:bg-blue-50 transition text-center">
+            <h4 class="font-semibold text-blue-700 mb-1">Changes to Terms</h4>
+            <p class="text-sm text-gray-600">How we update these terms</p>
+          </a>
+          <a href="#contact" class="bg-white p-4 rounded-lg border border-blue-200 hover:bg-blue-50 transition text-center">
+            <h4 class="font-semibold text-blue-700 mb-1">Contact Information</h4>
+            <p class="text-sm text-gray-600">How to reach us with questions</p>
+          </a>
+        </div>
+        
+        <!-- Quick Contact -->
+        <div class="mt-6 pt-6 border-t border-blue-200">
+          <h4 class="font-semibold text-blue-700 mb-2">Questions About These Terms?</h4>
+          <p class="text-blue-600 text-sm">
+            If you have any questions about these Terms & Conditions, please contact us at:
+            <span class="block font-medium mt-1">legal@diabetescare.com</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Final Acceptance -->
+      <div class="mt-10 p-6 bg-green-50 rounded-2xl border border-green-300 text-center">
+        <h3 class="text-xl font-bold text-green-800 mb-3">✅ Acceptance Confirmation</h3>
+        <p class="text-green-700 mb-4">
+          By using Diabetes Care Services, you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions.
+        </p>
+        <p class="text-sm text-green-600">
+          These Terms constitute the entire agreement between you and Diabetes Care regarding the use of our Services.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-blue-50 text-center text-gray-500 text-sm py-4 border-t mt-8">
+    <div class="container mx-auto px-4">
+      <p>© <span id="currentYear">2023</span> Diabetes Care. Empowering lives, one post at a time.</p>
+      <div class="mt-2 flex justify-center space-x-6 text-blue-600">
+        <a href="/privacy-policy" class="hover:text-blue-800 transition">Privacy Policy</a>
+        <a href="/terms" class="hover:text-blue-800 transition font-semibold">Terms & Conditions</a>
+        <a href="/contact" class="hover:text-blue-800 transition">Contact Us</a>
+        <a href="/cookies" class="hover:text-blue-800 transition">Cookie Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileBtn && mobileMenu) {
+      mobileBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!mobileBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+          mobileMenu.classList.add('hidden');
+        }
+      });
+    }
+
+    // Update copyright year
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentYear = new Date().getFullYear();
+      const yearElement = document.getElementById('currentYear');
+      if (yearElement) {
+        yearElement.textContent = currentYear;
+      }
+      
+      // Initialize all sections as closed except first one
+      const sections = ['servicesContent', 'accountContent', 'conductContent', 'medicalContent', 
+                       'intellectualContent', 'liabilityContent', 'terminationContent'];
+      sections.forEach(sectionId => {
+        const content = document.getElementById(sectionId);
+        const icon = document.getElementById(sectionId.replace('Content', 'Icon'));
+        if (content && icon) {
+          content.classList.remove('open');
+          icon.style.transform = 'rotate(-90deg)';
+        }
+      });
+    });
+
+    // Toggle section content
+    function toggleSection(sectionId) {
+      const content = document.getElementById(sectionId);
+      const icon = document.getElementById(sectionId.replace('Content', 'Icon'));
+      
+      if (content && icon) {
+        content.classList.toggle('open');
+        if (content.classList.contains('open')) {
+          icon.style.transform = 'rotate(0deg)';
+        } else {
+          icon.style.transform = 'rotate(-90deg)';
+        }
+      }
+    }
+
+    // Toggle all sections
+    let allExpanded = false;
+    function toggleAllSections() {
+      const sections = ['acceptanceContent', 'servicesContent', 'accountContent', 'conductContent', 
+                       'medicalContent', 'intellectualContent', 'liabilityContent', 'terminationContent'];
+      const toggleBtn = document.getElementById('toggleAllBtn');
+      
+      allExpanded = !allExpanded;
+      
+      sections.forEach(sectionId => {
+        const content = document.getElementById(sectionId);
+        const icon = document.getElementById(sectionId.replace('Content', 'Icon'));
+        
+        if (content && icon) {
+          if (allExpanded) {
+            content.classList.add('open');
+            icon.style.transform = 'rotate(0deg)';
+          } else {
+            content.classList.remove('open');
+            icon.style.transform = 'rotate(-90deg)';
+          }
+        }
+      });
+      
+      toggleBtn.textContent = allExpanded ? 'Collapse All Sections' : 'Expand All Sections';
+    }
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (targetId !== '#') {
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+            
+            // Open the section if it's a content section
+            const contentId = targetId.substring(1) + 'Content';
+            toggleSection(contentId);
+          }
+        }
+      });
+    });
+
+    // Print functionality
+    function printTerms() {
+      window.print();
+    }
+  </script>
+</body>
+</html>

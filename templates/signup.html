@@ -1,142 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <title>Signup | Diabetes Chatbot</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f7ff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .auth-card {
-            background: #ffffff;
-            width: 100%;
-            max-width: 440px;
-            padding: 32px;
-            border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(37, 99, 235, 0.25);
-        }
-
-        .auth-title {
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #1e40af;
-            margin-bottom: 8px;
-        }
-
-        .auth-subtitle {
-            text-align: center;
-            color: #6b7280;
-            margin-bottom: 24px;
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #2563eb;
-            border-radius: 10px;
-            font-size: 1rem;
-            outline: none;
-            margin-bottom: 16px;
-        }
-
-        .auth-input:focus {
-            border-color: #1e40af;
-            box-shadow: 0 0 6px rgba(37, 99, 235, 0.4);
-        }
-
-        .auth-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-            color: white;
-            font-size: 1.05rem;
-            font-weight: 600;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-        }
-
-        .auth-btn:hover {
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.6);
-        }
-
-        .auth-link {
-            text-align: center;
-            margin-top: 18px;
-            font-size: 0.95rem;
-        }
-
-        .auth-link a {
-            color: #2563eb;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .auth-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ _('Sign Up') }} | {{ _('Diabetes Care') }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+  <style>
+    * { transition: background-color 0.3s ease, border-color 0.3s ease; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .dark .glass-card {
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .input-field:focus { transform: scale(1.01); }
+    .theme-toggle:hover { transform: rotate(15deg) scale(1.1); }
+  </style>
 </head>
 
-<body>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col transition-colors duration-300">
 
-    <div class="auth-card">
-        <h2 class="auth-title">Create Account</h2>
-        <p class="auth-subtitle">Join the Diabetes Expert Chatbot</p>
-
-        <form method="POST" action="/signup">
-            <input
-                type="text"
-                name="name"
-                class="auth-input"
-                placeholder="Full Name"
-                required
-            >
-
-            <input
-                type="email"
-                name="email"
-                class="auth-input"
-                placeholder="Email Address"
-                required
-            >
-
-            <input
-                type="password"
-                name="password"
-                class="auth-input"
-                placeholder="Password"
-                required
-            >
-
-            <input
-                type="password"
-                name="confirm_password"
-                class="auth-input"
-                placeholder="Confirm Password"
-                required
-            >
-
-            <button type="submit" class="auth-btn">Sign Up</button>
-        </form>
-
-
-        <div class="auth-link">
-            Already have an account?
-            <a href="/login">Login</a>
+  <!-- Navbar -->
+  <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-slate-800 dark:to-slate-900 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="/" class="flex items-center gap-2">
+          <span class="text-2xl">⚕️</span>
+          <span class="text-xl font-bold">Diabetes<span class="text-cyan-300">Care</span></span>
+        </a>
+        <div class="flex items-center gap-3">
+          <button onclick="toggleTheme()" class="theme-toggle p-2 rounded-lg hover:bg-white/10 transition" aria-label="Toggle dark mode">
+            <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <svg id="theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </button>
+          <a href="/login" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium transition">{{ _('Login') }}</a>
         </div>
+      </div>
     </div>
+  </nav>
 
+  <!-- Main Content -->
+  <main class="flex-grow flex items-center justify-center p-6">
+    <div class="w-full max-w-md fade-in">
+      <!-- Signup Card -->
+      <div class="glass-card rounded-2xl shadow-2xl overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-indigo-700 dark:to-purple-800 px-8 py-6 text-center">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+          </div>
+          <h1 class="text-2xl font-bold text-white">{{ _('Create Account') }}</h1>
+          <p class="text-blue-100 mt-1">{{ _('Join the Diabetes Care community') }}</p>
+        </div>
+        
+        <div class="p-8 bg-white dark:bg-slate-900">
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="mb-4 p-4 rounded-xl {% if category == 'error' %}bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800{% else %}bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800{% endif %}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+          
+          <form method="POST" action="/signup" class="space-y-4">
+            <div>
+              <label for="username" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ _('Username') }}</label>
+              <input type="text" id="username" name="username" required placeholder="Choose a username"
+                class="input-field w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 focus:bg-white dark:focus:bg-slate-700 outline-none transition text-gray-800 dark:text-white" />
+            </div>
+            
+            <div>
+              <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ _('Email Address') }}</label>
+              <input type="email" id="email" name="email" required placeholder="you@example.com"
+                class="input-field w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 focus:bg-white dark:focus:bg-slate-700 outline-none transition text-gray-800 dark:text-white" />
+            </div>
+            
+            <div>
+              <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ _('Password') }}</label>
+              <input type="password" id="password" name="password" required placeholder="••••••••"
+                class="input-field w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 focus:bg-white dark:focus:bg-slate-700 outline-none transition text-gray-800 dark:text-white" />
+            </div>
+            
+            <div>
+              <label for="confirm_password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ _('Confirm Password') }}</label>
+              <input type="password" id="confirm_password" name="confirm_password" required placeholder="••••••••"
+                class="input-field w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 focus:bg-white dark:focus:bg-slate-700 outline-none transition text-gray-800 dark:text-white" />
+            </div>
+            
+            <button type="submit"
+              class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+              </svg>
+              {{ _('Create Account') }}
+            </button>
+          </form>
+          
+          <div class="mt-6 text-center">
+            <p class="text-gray-600 dark:text-gray-400">
+              {{ _('Already have an account?') }}
+              <a href="/login" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline">{{ _('Login') }}</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-6">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p class="text-gray-400 text-sm">© {{ current_year }} {{ _('Diabetes Care with AI') }}. {{ _('All rights reserved.') }}</p>
+    </div>
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      var isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateThemeIcons();
+    }
+    function updateThemeIcons() {
+      var isDark = document.documentElement.classList.contains('dark');
+      document.getElementById('theme-icon-sun').classList.toggle('hidden', !isDark);
+      document.getElementById('theme-icon-moon').classList.toggle('hidden', isDark);
+    }
+    document.addEventListener('DOMContentLoaded', updateThemeIcons);
+  </script>
 </body>
 </html>
+""

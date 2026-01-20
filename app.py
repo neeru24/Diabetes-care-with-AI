@@ -6,10 +6,19 @@ import pickle
 import re
 import sys
 import threading
+import joblib
 import json
+import warnings
 from datetime import datetime, timezone
+from config import Config
 
+# Suppress scikit-learn version warnings
+warnings.filterwarnings('ignore', category=UserWarning, module='sklearn')
 # --- External Libraries ---
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -21,8 +30,15 @@ from flask_mail import Mail, Message
 from flask_babel import Babel, gettext as _
 from dotenv import load_dotenv
 
+# --- New Auth Imports ---
+from flask_login import LoginManager, login_user, current_user, logout_user, login_required
+from flask_bcrypt import Bcrypt
+
 # --- Database & New AI SDK Imports ---
-from models import db, Post  # Feature #113: Database Model
+from models import db, Post, User, PredictionHistory  # Feature #113: Database Model
+# from google import genai     # Fix #112: New Google GenAI SDK
+import google.generativeai as genai
+
 # from google import genai     # Fix #112: New Google GenAI SDK
 import google.generativeai as genai
 
@@ -31,7 +47,7 @@ import google.generativeai as genai
 load_dotenv()
 
 app = Flask(__name__)
-
+app.config.from_object(Config)
 # --- Database Configuration (Feature #113) ---
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///forum.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -40,6 +56,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 with app.app_context():
     db.create_all()
+
+# --- Auth Configuration (New) ---
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # --- App Configuration ---
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -84,6 +109,7 @@ def inject_i18n_context():
         'languages': SUPPORTED_LANGUAGES,
         'current_language': get_locale(),
         'current_year': datetime.now().year,
+        'current_user': current_user # Make user available in all templates
     }
 
 @app.route('/api/set-language', methods=['POST'])
@@ -137,15 +163,20 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s: %(message)s')
 
 # --- Load ML Model and Scaler ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "diabetes_model.pkl")
+SCALER_PATH = os.path.join(BASE_DIR, "models", "scaler.pkl")
 try:
-    model = pickle.load(open('diabetes_model.pkl', 'rb'))
+    model = joblib.load(MODEL_PATH)
+    print(MODEL_PATH)
+    print(os.path.exists(MODEL_PATH))
     logging.info("Diabetes model loaded successfully.")
 except Exception as e:
     logging.error(f"Model load error: {e}")
     model = None
 
 try:
-    scaler = pickle.load(open('scaler.pkl', 'rb'))
+    scaler = joblib.load(SCALER_PATH)
     logging.info("Scaler loaded successfully.")
 except Exception as e:
     logging.error(f"Scaler load error: {e}")
@@ -160,9 +191,14 @@ except Exception as e:
 
 # --- Gemini AI Client Initialization (Fix #112) ---
 try:
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    if app.config.get("GEMINI_API_KEY") and app.config["GEMINI_API_KEY"] != "your_gemini_api_key_here":
+        client = genai.Client(api_key = app.config["GEMINI_API_KEY"])
+        logging.info("Gemini Client initialized successfully.")
+    else:
+        client = None
+        logging.warning("Gemini API Key not configured. Chatbot features will be limited.")
 except Exception as e:
-    logging.error(f"Failed to initialize Gemini Client: {e}")
+    logging.warning(f"Gemini Client initialization skipped: {e}")
     client = None
 
 def get_gemini_response(user_message):
@@ -190,6 +226,146 @@ def root():
 def home():
     return render_template('index.html')
 
+# --- Authentication Routes ---
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        data = request.get_json() if request.is_json else request.form
+        username = data.get('username')
+        password = data.get('password')
+        
+        user = User.query.filter_by(username=username).first()
+        
+        if user and user.check_password(password):
+            session['user_id'] = user.id
+            session['username'] = user.username
+            if request.is_json:
+                return jsonify({"success": True, "message": "Login successful", "username": user.username})
+            flash(_('Login successful!'), 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            if request.is_json:
+                return jsonify({"success": False, "message": "Invalid username or password"}), 401
+            flash(_('Invalid username or password'), 'error')
+    
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        data = request.get_json() if request.is_json else request.form
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+        
+        # Validate input
+        if not username or not email or not password:
+            if request.is_json:
+                return jsonify({"success": False, "message": "All fields are required"}), 400
+            flash(_('All fields are required'), 'error')
+            return render_template('signup.html')
+        
+        # Check if user already exists
+        if User.query.filter_by(username=username).first():
+            if request.is_json:
+                return jsonify({"success": False, "message": "Username already exists"}), 400
+            flash(_('Username already exists'), 'error')
+            return render_template('signup.html')
+        
+        if User.query.filter_by(email=email).first():
+            if request.is_json:
+                return jsonify({"success": False, "message": "Email already registered"}), 400
+            flash(_('Email already registered'), 'error')
+            return render_template('signup.html')
+        
+        # Create new user
+        new_user = User(username=username, email=email)
+        new_user.set_password(password)
+        
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            
+            # Log in the user
+            session['user_id'] = new_user.id
+            session['username'] = new_user.username
+            
+            if request.is_json:
+                return jsonify({"success": True, "message": "Account created successfully", "username": new_user.username})
+            flash(_('Account created successfully!'), 'success')
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Signup error: {e}")
+            if request.is_json:
+                return jsonify({"success": False, "message": "An error occurred"}), 500
+            flash(_('An error occurred. Please try again.'), 'error')
+    
+    return render_template('signup.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash(_('Logged out successfully'), 'success')
+    return redirect(url_for('root'))
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        flash(_('Please login to access dashboard'), 'error')
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.clear()
+        return redirect(url_for('login'))
+    
+    # Get user's prediction history
+    predictions = PredictionHistory.query.filter_by(user_id=user.id).order_by(PredictionHistory.timestamp.desc()).all()
+    
+    return render_template('dashboard.html', user=user, predictions=predictions)
+
+@app.route('/api/dashboard/trend-data')
+def dashboard_trend_data():
+    """API endpoint to get trend data for charts"""
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    user_id = session['user_id']
+    predictions = PredictionHistory.query.filter_by(user_id=user_id).order_by(PredictionHistory.timestamp.asc()).all()
+    
+    # Prepare data for charts
+    trend_data = {
+        "dates": [],
+        "glucose": [],
+        "bmi": [],
+        "blood_pressure": [],
+        "predictions": [],
+        "risk_scores": []
+    }
+    
+    for pred in predictions:
+        trend_data["dates"].append(pred.timestamp.strftime('%Y-%m-%d %H:%M'))
+        trend_data["glucose"].append(pred.glucose)
+        trend_data["bmi"].append(pred.bmi)
+        trend_data["blood_pressure"].append(pred.blood_pressure)
+        trend_data["predictions"].append(pred.prediction)
+        trend_data["risk_scores"].append(pred.risk_score if pred.risk_score else 0)
+    
+    # Calculate statistics
+    stats = {
+        "total_predictions": len(predictions),
+        "diabetic_count": sum(1 for p in predictions if p.prediction == 1),
+        "average_glucose": sum(p.glucose for p in predictions) / len(predictions) if predictions else 0,
+        "average_bmi": sum(p.bmi for p in predictions) / len(predictions) if predictions else 0,
+    }
+    
+    return jsonify({
+        "trend_data": trend_data,
+        "stats": stats
+    })
+
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
@@ -204,11 +380,57 @@ def predict():
              return render_template('index.html', prediction_text=_("Error: Input values cannot be negative."))
 
         if scaler is None or model is None:
+            print(scaler)
+            print(model)
             return render_template('index.html', prediction_text=_("Model not available."))
 
         final_input = scaler.transform([features])
         prediction = model.predict(final_input)
+        
+        # Get probability score if available
+        risk_score = None
+        if hasattr(model, 'predict_proba'):
+            try:
+                proba = model.predict_proba(final_input)
+                risk_score = float(proba[0][1])  # Probability of being diabetic
+            except:
+                pass
+        
         result = _("Diabetic") if prediction[0] == 1 else _("Not Diabetic")
+        
+        # Save prediction history for logged-in users
+        if 'user_id' in session:
+            try:
+                prediction_record = PredictionHistory(
+                    user_id=session['user_id'],
+                    pregnancies=int(features[0]),
+                    glucose=features[1],
+                    blood_pressure=features[2],
+                    skin_thickness=features[3],
+                    insulin=features[4],
+                    bmi=features[5],
+                    dpf=features[6],
+                    age=int(features[7]),
+                    prediction=int(prediction[0]),
+                    risk_score=risk_score
+                )
+                db.session.add(prediction_record)
+                db.session.commit()
+            except Exception as e:
+                logging.error(f"Error saving prediction history: {e}")
+                db.session.rollback()
+
+        # --- SAVE HISTORY IF LOGGED IN (New) ---
+        if current_user.is_authenticated:
+            new_pred = Prediction(
+                glucose=int(features[1]),
+                bmi=float(features[5]),
+                age=int(features[7]),
+                result=result,
+                author=current_user
+            )
+            db.session.add(new_pred)
+            db.session.commit()
 
         return render_template('index.html', prediction_text=_("Prediction: %(result)s", result=result))
     except Exception as e:
@@ -614,13 +836,16 @@ def generate():
         if not user_input:
             return jsonify({'reply': "Please say something!"})
 
-        # --- NEW CODE START ---
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            return jsonify({'reply': "Error: Gemini API Key not configured."})
+
+        client = genai.Client(api_key=api_key)
         response = client.models.generate_content(
-            model='gemini-2.0-flash', # Or 'gemini-1.5-flash'
+            model='gemini-2.0-flash',
             contents=user_input
         )
         reply_text = response.text
-        # --- NEW CODE END ---
         
         return jsonify({'reply': reply_text})
     except Exception as e:
@@ -1032,6 +1257,9 @@ def mark_notifications_read(user_id):
     
     return jsonify({"message": f"Processed {count} notifications"})
 
+# --- NEW AUTH ROUTES (Register, Login, Logout, Dashboard) ---
+
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)
