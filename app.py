@@ -1272,30 +1272,6 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
-@app.route("/login", methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    if request.method == 'POST':
-        user = User.query.filter_by(email=request.form.get('email')).first()
-        if user and bcrypt.check_password_hash(user.password, request.form.get('password')):
-            login_user(user)
-            return redirect(url_for('home'))
-        else:
-            flash('Login Unsuccessful. Check email and password', 'danger')
-    return render_template('login.html')
-
-@app.route("/logout")
-def logout():
-    logout_user()
-    return redirect(url_for('home'))
-
-@app.route("/dashboard")
-@login_required
-def dashboard():
-    user_predictions = Prediction.query.filter_by(author=current_user).order_by(Prediction.date_posted.desc()).all()
-    return render_template('dashboard.html', predictions=user_predictions)
-
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
