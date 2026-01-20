@@ -71,7 +71,15 @@
           min-height: auto !important;
           page-break-after: avoid !important;
         }
-
+        body {
+    padding-top: 100px; /* Space for navbar */
+    overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+  }
+  .nav-floating {
+    position: fixed;
+    top: 20px;
+    z-index: 9999; /* Ensure it stays above everything */
+  }
         html,
         body {
           height: auto !important;
@@ -885,7 +893,7 @@
           alert("PDF generation is not available.");
         }
       }
-    }
+    
 
     // Email Report Functions
     function toggleEmailForm() {
